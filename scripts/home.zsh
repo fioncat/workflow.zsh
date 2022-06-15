@@ -47,35 +47,35 @@ workflow_home() {
 			return
 		fi
 
+		read "ret?Use SSH or not? (y/n) "
+		if [[ $ret =~ ^[Yy]$ ]]; then
+			local clone_url="git@$domain_url:$group/$repo.git"
+		else
+			local clone_url="https://$domain_url/$group/$repo.git"
+		fi
+
+		local config_path=$WORKFLOW_HOME/.domain/$domain
+		if [ ! -f $mapping_path ]; then
+			echo "The config path $config_path does not exists, please run 'workflow_home_config_domain $domain'."
+			return
+		fi
+		local domain_url=$(cat $config_path/url)
+		local domain_user=$(cat $config_path/user)
+		local domain_email=$(cat $config_path/email)
+
 		read "ret?Do you want to clone this repo from VCS? (y/n) "
 		if [[ $ret =~ ^[Yy]$ ]]; then
-			local config_path=$WORKFLOW_HOME/.domain/$domain
-			if [ ! -f $mapping_path ]; then
-				echo "The config path $config_path does not exists, please run 'workflow_home_config_domain $domain'."
-				return
-			fi
-
-			local domain_url=$(cat $config_path/url)
-			local domain_user=$(cat $config_path/user)
-			local domain_email=$(cat $config_path/email)
-
-			read "ret?Use SSH or not? (y/n) "
-			if [[ $ret =~ ^[Yy]$ ]]; then
-				local clone_url="git@$domain_url:$group/$repo.git"
-			else
-				local clone_url="https://$domain_url/$group/$repo.git"
-			fi
-
 			echo "Clone $clone_url..."
 			git clone $clone_url $repo_path
-			echo "[user]\n\tname = $domain_user\n\temail = $domain_email" >> $repo_path/.git/config
+			cd $repo_path
 		else
 			# TODO: init the repo according to different languages.
-			mkdir -p $repo_path
+			mkdir -p $repo_path; cd $repo_path
+			git init
+			git remote add origin $clone_url
 		fi
+		echo "[user]\n\tname = $domain_user\n\temail = $domain_email" >> .git/config
 	fi
-
-	cd $repo_path
 }
 
 _workflow_home() {
