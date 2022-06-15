@@ -111,6 +111,41 @@ _workflow_home() {
 
 complete -F _workflow_home workflow_home
 
+# This require: tree and fzf commands.
+workflow_home_search() {
+	if [ "$#" != "1" ]; then
+		echo 'usage: workflow_home_search <domain>'
+		return 1
+	fi
+	local domain=$1
+	local domain_path=$WORKFLOW_HOME/src/$domain
+	local domain_path_escpaed=$(echo $domain_path | sed 's/\//\\\//g')
+	if [ ! -d $domain_path ]; then
+		echo "unknown domain $domain"
+		return 1
+	fi
+	local dirs=("${(@f)$(tree -L 2 -fi $domain_path)}")
+	local repos=()
+	for (( i=0; i < ${#dirs[@]}; i++ )); do
+		local dir=${dirs[i]}
+		if [[ $dir == $domain_path/* ]]; then
+			local dir=$(echo $dir | sed "s/$domain_path_escpaed\///1")
+			if [[ $dir == *"/"* ]]; then
+				repos+=("$dir")
+			fi
+		fi
+	done
+	local result=$(printf "%s\n" "${repos[@]}" | fzf)
+	local repo_path=$domain_path/$result
+	cd $repo_path
+}
+
+_workflow_home_search() {
+	ls $WORKFLOW_HOME/src
+}
+
+complete -F _workflow_home_search workflow_home_search
+
 workflow_home_config_domain() {
 	if [ "$#" != "1" ]; then
 		echo "usage: workflow_home_update_domain <domain>"
