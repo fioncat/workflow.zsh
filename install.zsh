@@ -27,6 +27,8 @@ cat <<EOT >> $wf_home/env/secret.zsh
 
 EOT
 
+echo ""
+echo ""
 echo "Congratulations! You have workflow.zsh installed in your machine."
 echo "Please add the following script to your .zshrc to continue:"
 echo ""
