@@ -1,3 +1,7 @@
 .domain
+
 src
 env
+doc
+
+.DS_Store

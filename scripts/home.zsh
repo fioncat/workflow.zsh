@@ -100,6 +100,7 @@ workflow_home() {
 }
 
 _workflow_home() {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
 	if [ $# -lt 1 ] || [ $# -gt 3 ]; then
 		COMPREPLY=($(compgen -W "" $cur))
 		return
@@ -155,6 +156,9 @@ workflow_home_search() {
 		fi
 	done
 	local result=$(printf "%s\n" "${repos[@]}" | fzf)
+	if [ -z $result ]; then
+		return
+	fi
 	local repo_path=$domain_path/$result
 	cd $repo_path
 }
