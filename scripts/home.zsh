@@ -75,7 +75,9 @@ workflow_home() {
 			git remote add origin $clone_url
 		fi
 		echo "[user]\n\tname = $domain_user\n\temail = $domain_email" >> .git/config
+		return
 	fi
+	cd $repo_path
 }
 
 _workflow_home() {
