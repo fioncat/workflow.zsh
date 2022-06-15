@@ -2,6 +2,7 @@
 workflow_update() {
 	cd $WORKFLOW_HOME
 	git pull
+	cd $HOME; source $WORKFLOW_HOME/init.zsh
 }
 
 workflow_edit_alias() {
