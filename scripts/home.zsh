@@ -47,13 +47,6 @@ workflow_home() {
 			return
 		fi
 
-		read "ret?Use SSH or not? (y/n) "
-		if [[ $ret =~ ^[Yy]$ ]]; then
-			local clone_url="git@$domain_url:$group/$repo.git"
-		else
-			local clone_url="https://$domain_url/$group/$repo.git"
-		fi
-
 		local config_path=$WORKFLOW_HOME/.domain/$domain
 		if [ ! -f $mapping_path ]; then
 			echo "The config path $config_path does not exists, please run 'workflow_home_config_domain $domain'."
@@ -63,16 +56,42 @@ workflow_home() {
 		local domain_user=$(cat $config_path/user)
 		local domain_email=$(cat $config_path/email)
 
+		read "ret?Use SSH or not? (y/n) "
+		if [[ $ret =~ ^[Yy]$ ]]; then
+			local clone_url="git@$domain_url:$group/$repo.git"
+		else
+			local clone_url="https://$domain_url/$group/$repo.git"
+		fi
+
 		read "ret?Do you want to clone this repo from VCS? (y/n) "
 		if [[ $ret =~ ^[Yy]$ ]]; then
-			echo "Clone $clone_url..."
+			echo "Cloning $clone_url..."
 			git clone $clone_url $repo_path
 			cd $repo_path
 		else
-			# TODO: init the repo according to different languages.
 			mkdir -p $repo_path; cd $repo_path
 			git init
 			git remote add origin $clone_url
+			echo "# $repo\n" >> README.md
+			read "lang?Please enter your repo type? (default empty) "
+			case $lang in
+				go|golang|g)
+					echo "go mod init $domain_url/$group/$repo"
+					go mod init $domain_url/$group/$repo
+					;;
+				py|python|python3|python2)
+					# TODO: Python init.
+					;;
+				rust|rs)
+					# TODO: Rust init.
+					;;
+				node|npm)
+					# TODO: NPM init.
+					;;
+				*)
+					echo "empty repo, do nothing."
+					;;
+			esac
 		fi
 		echo "[user]\n\tname = $domain_user\n\temail = $domain_email" >> .git/config
 		return
