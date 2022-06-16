@@ -1,7 +1,9 @@
 .domain
+.play_tpl
 
 src
 env
 doc
+play
 
 .DS_Store
